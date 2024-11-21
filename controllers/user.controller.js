@@ -1,5 +1,5 @@
 const dinoUser = require("../models/dinosaurs.data.js");
-const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const getUser = async (req, res) => {
     try {
@@ -12,12 +12,14 @@ const getUser = async (req, res) => {
 
 const createAccount = async (req, res) => {
     try {
-        var nameX = req.query.name
+        var nameX = req.query.name;
         var search = await dinoUser.find({name: nameX})
+        var userPassword = req.query.password;
+        const hash = bcrypt.hashSync(userPassword, 10);
         if (search.length > 0) {
             res.status(500).json({message: 'username have already been used.'})
         } else {
-            const makeDinosaur = await dinoUser.create(req.query);
+            const makeDinosaur = await dinoUser.create({name: req.query.name, password: hash});
             res.status(200).json(makeDinosaur)
         }
     } catch (error) {
@@ -29,7 +31,10 @@ const loginProfile = async (req, res) => {
     try {
         var nameX = req.query.name
         var passX = req.query.password
-        var search = await dinoUser.find({name: nameX, password: passX})
+        var search = await dinoUser.find({name: nameX})
+        var hashedPassword = search[0].password
+        var passwordTrue = bcrypt.compareSync(passX, hashedPassword);
+        if (search.length > 0 && passwordTrue)
         if (search.length > 0) {
             res.send("User found! Logged in!")
         } else {

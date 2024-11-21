@@ -3,10 +3,12 @@ const mongoose = require('mongoose');
 const userRoute = require("./routes/user.route.js")
 const threadRoute = require("./routes/thread.route.js")
 const app = express()
+const cors = require('cors')
 
 // middleware config
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
+app.use(cors())
 
 var openingLine = "Welcome to DinoForums! A forum for fossil enthusiasts (not dinos)"
 
